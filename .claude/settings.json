@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit(**/.claude/skills/**.md)",
+      "Edit(**.md)",
+      "WebFetch(domain:api.scryfall.com)",
+      "WebFetch(domain:scryfall.com)",
+      "WebSearch"
+    ]
+  },
+  "skillOverrides": {
+    "update-config": "user-invocable-only",
+    "keybindings-help": "user-invocable-only",
+    "simplify": "user-invocable-only",
+    "fewer-permission-prompts": "user-invocable-only",
+    "loop": "user-invocable-only",
+    "schedule": "user-invocable-only",
+    "claude-api": "user-invocable-only",
+    "init": "user-invocable-only",
+    "review": "user-invocable-only",
+    "security-review": "user-invocable-only"
+  }
+}

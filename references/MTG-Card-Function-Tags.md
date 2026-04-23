@@ -2,9 +2,26 @@
 
 Use these tags to categorize the purpose of each card in a deck. A single card may carry multiple tags — apply every tag that reflects a genuine role the card plays.
 
+## Quick Reference — Top-Level Categories
+
+| Tag | Use for |
+|-----|---------|
+| `Card Advantage` | Draw, selection, impulse draw, looting, graveyard value |
+| `Removal` | Targeted removal, board wipes, bounce, exile, fight |
+| `Countermagic` | Hard counters, soft counters, stax, protection, redirect |
+| `Mana` | Ramp, rocks, dorks, cost reduction, rituals, treasure |
+| `Recursion` | Graveyard recursion, reanimation, flashback, self-mill |
+| `Tutors` | Library search of any kind |
+| `Win Conditions` | Finishers, combo pieces, alternative wins |
+| `Creatures` | Evasion, utility, beaters, blockers, tokens, anthems |
+| `Synergy` | Tribal payoffs, aristocrats, ETB/LTB payoffs, sacrifice |
+| `Enchantments` | Auras, equipment, sagas, enchantress, artifact payoffs, voltron |
+| `Resource Denial` | Land destruction, hand disruption, lockpieces, taxation, pillow fort |
+| `Utility` | Haste enablers, copy effects, flicker, political, catch-all, hate bears |
+
 ---
 
-## Card Advantage & Selection
+## Card Advantage
 
 | Tag | Description | Examples |
 |-----|-------------|---------|
@@ -17,7 +34,7 @@ Use these tags to categorize the purpose of each card in a deck. A single card m
 
 ---
 
-## Removal & Interaction
+## Removal
 
 | Tag | Description | Examples |
 |-----|-------------|---------|
@@ -33,7 +50,7 @@ Use these tags to categorize the purpose of each card in a deck. A single card m
 
 ---
 
-## Countermagic & Protection
+## Countermagic
 
 | Tag | Description | Examples |
 |-----|-------------|---------|
@@ -45,7 +62,7 @@ Use these tags to categorize the purpose of each card in a deck. A single card m
 
 ---
 
-## Mana & Tempo
+## Mana
 
 | Tag | Description | Examples |
 |-----|-------------|---------|
@@ -59,7 +76,7 @@ Use these tags to categorize the purpose of each card in a deck. A single card m
 
 ---
 
-## Recursion & Graveyard
+## Recursion
 
 | Tag | Description | Examples |
 |-----|-------------|---------|
@@ -71,7 +88,7 @@ Use these tags to categorize the purpose of each card in a deck. A single card m
 
 ---
 
-## Tutor & Search
+## Tutors
 
 | Tag | Description | Examples |
 |-----|-------------|---------|
@@ -82,7 +99,7 @@ Use these tags to categorize the purpose of each card in a deck. A single card m
 
 ---
 
-## Win Conditions & Threats
+## Win Conditions
 
 | Tag | Description | Examples |
 |-----|-------------|---------|
@@ -95,7 +112,7 @@ Use these tags to categorize the purpose of each card in a deck. A single card m
 
 ---
 
-## Creatures by Role
+## Creatures
 
 | Tag | Description | Examples |
 |-----|-------------|---------|
@@ -108,7 +125,7 @@ Use these tags to categorize the purpose of each card in a deck. A single card m
 
 ---
 
-## Synergy & Tribal
+## Synergy
 
 | Tag | Description | Examples |
 |-----|-------------|---------|
@@ -121,7 +138,7 @@ Use these tags to categorize the purpose of each card in a deck. A single card m
 
 ---
 
-## Enchantments & Artifacts
+## Enchantments
 
 | Tag | Description | Examples |
 |-----|-------------|---------|
@@ -134,7 +151,7 @@ Use these tags to categorize the purpose of each card in a deck. A single card m
 
 ---
 
-## Resource Denial & Control
+## Resource Denial
 
 | Tag | Description | Examples |
 |-----|-------------|---------|
@@ -146,7 +163,7 @@ Use these tags to categorize the purpose of each card in a deck. A single card m
 
 ---
 
-## Utility & Miscellaneous
+## Utility
 
 | Tag | Description | Examples |
 |-----|-------------|---------|
@@ -166,5 +183,8 @@ Use these tags to categorize the purpose of each card in a deck. A single card m
 
 - **Apply all relevant tags.** A card like Reclamation Sage is both `Targeted Removal` and `Utility Creature`. Apply every tag that reflects a genuine role.
 - **Format context matters.** Tags like `Sideboard`, `Silver Bullet`, and `Hate Bear` are most relevant in 60-card formats. `Political` is almost exclusively a Commander concern.
-- **Two layers of tagging.** Consider maintaining both a *mechanical* tag (what the card does) and a *strategic* tag (why it is in this specific deck).
+- **Two tag types — Global and Deck.**
+  - **Global Tags (`#!`)** cover the card's universal mechanical function — roles that would apply to this card in any deck. Use these for broad, format-agnostic categories like `Ramp`, `Removal`, or `Card Draw`.
+  - **Deck Tags (`#`)** cover the card's strategic role in *this specific deck*. Use these when a card's value is tied to the deck's particular theme, commander mechanic, or combo — roles that wouldn't apply to the card in most other contexts.
+  - A card can carry both types. Example: `Altar of Dementia` in a Meren deck → `#!Sacrifice Outlet #!Self-Mill #Win Conditions` (global roles any deck would recognize, plus a deck-specific combo role).
 - **Revisit tags when the deck changes.** A card's role can shift as the deck evolves — a `Tutor` target may become a `Win Condition` in a different build.

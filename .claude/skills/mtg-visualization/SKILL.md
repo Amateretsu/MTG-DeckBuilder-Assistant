@@ -1,6 +1,6 @@
 ---
 name: mtg-visualization
-description: Produces an interactive deck analysis dashboard for a Magic The Gathering deck using Chart.js. Use this skill whenever the user asks to analyze, visualize, or see a breakdown of a deck — including requests like "analyze this deck", "show me the curve", "give me a deck breakdown", "visualize the mana base", or "show deck stats". Also use it when a completed deck is presented and the user hasn't explicitly said they only want the export.
+description: Interactive MTG deck analysis dashboard using Chart.js. Use for deck analysis, visualization, mana curve, or breakdown requests. Also use when a completed deck is presented unless the user only wants the export.
 ---
 
 # MTG Deck Analysis Visualization
@@ -9,7 +9,11 @@ Produces an interactive HTML dashboard via `visualize:show_widget` using Chart.j
 
 ## Common Settings
 
-Detect dark mode via `matchMedia`; derive `textColor` and `gridColor` accordingly. All charts: `responsive: true`, `maintainAspectRatio: false`, `legend: false`, bars with `borderRadius: 4`, `borderSkipped: false`. Use CSS variables (`--color-background-secondary`, `--color-text-primary`, `--color-text-secondary`, `--color-border-tertiary`, `--border-radius-md`, `--border-radius-lg`) throughout. Include `<h2 class="sr-only">` and `role="img"` + `aria-label` on every `<canvas>`.
+- Dark mode: detect via `matchMedia`; derive `textColor` and `gridColor`
+- All charts: `responsive: true`, `maintainAspectRatio: false`, no built-in legend
+- Bars: `borderRadius: 4`, `borderSkipped: false`
+- CSS vars: `--color-background-secondary`, `--color-text-primary`, `--color-text-secondary`, `--color-border-tertiary`, `--border-radius-md`, `--border-radius-lg`
+- Accessibility: `<h2 class="sr-only">` + `role="img"` and `aria-label` on every `<canvas>`
 
 **Color palette:** Creatures `#534AB7` · Artifacts `#1D9E75` · Sorceries `#D85A30` · Instants `#378ADD` · Planeswalkers `#D4537E` · Enchantments `#888780`
 
@@ -28,11 +32,13 @@ Vertical bar, `barPercentage: 0.7`. X-axis MV 0–13+. Bars MV 7+ in `#534AB7`, 
 
 ## 4. Functional Roles Horizontal Bar
 
-`indexAxis: 'y'`, `barPercentage: 0.6`, categories in descending count order drawn from the deck's actual MTG-Card-Function-Tags.md top-level categories.
+`indexAxis: 'y'`, `barPercentage: 0.6`, categories in descending count order drawn from the deck's actual tags. Use these 12 top-level tag names exactly:
+
+`Card Advantage` · `Removal` · `Countermagic` · `Mana` · `Recursion` · `Tutors` · `Win Conditions` · `Creatures` · `Synergy` · `Enchantments` · `Resource Denial` · `Utility`
 
 ## 5. Commander Mechanic Panel
 
-Rounded panel summarizing the commander's core engine, key enablers, and 3 notable synergy targets. Adapt entirely to the actual commander — no generic text.
+Rounded panel. Format: commander name as heading, core engine in 2–3 sentences, enablers as an inline list, each of 3 notable synergy targets with a one-sentence note. Adapt entirely to the actual commander — no generic text.
 
 ## 6. Land Base Breakdown
 
@@ -41,6 +47,6 @@ Rounded panel summarizing the commander's core engine, key enablers, and 3 notab
 ## 7. Action Buttons
 
 3 buttons via `sendPrompt()`:
-- `"Export this [Commander] deck as a downloadable .txt file"`
+- `"Export this [Commander] deck as a .txt file and write the Moxfield primer"`
 - `"Suggest budget alternatives for the most expensive cards in this deck"`
 - `"What are the best opening hands and mulligan strategy for this deck?"`
