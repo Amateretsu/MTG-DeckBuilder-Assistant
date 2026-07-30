@@ -1,7 +1,7 @@
 ---
 name: mtg-visualization
 description: Produces an interactive deck analysis dashboard for a Magic The Gathering deck (any format — 60-card constructed, Commander, Brawl, Oathbreaker, etc.) using Chart.js. Use this skill whenever the user asks to analyze, visualize, or see a breakdown of a deck — including requests like "analyze this deck", "show me the curve", "give me a deck breakdown", "visualize the mana base", or "show deck stats". Also use it when a completed deck is presented and the user hasn't explicitly said they only want the export.
-compatibility: Uses the mtg-dashboard-template skill for color palette, Chart.js defaults, stat-card CSS, and accessibility conventions (Common Settings section) — don't re-inline a separate copy of these. Uses the mtg-format-rules skill to determine which format-family branch applies in sections 5-6, rather than a hardcoded Commander-vs-60-card binary. Uses the mtg-card-taxonomy skill's reference file for the Functional Roles chart (section 4). Works without any of them — see the fallback notes — but output is more consistent with all installed.
+compatibility: Uses mtg-dashboard-template for color palette, Chart.js defaults, stat-card CSS, and accessibility conventions (Common Settings) — don't re-inline a separate copy. Uses mtg-format-rules to pick the format-family branch in sections 5-6, instead of a hardcoded Commander-vs-60-card binary. Uses mtg-card-taxonomy for the Functional Roles chart (section 4). Works without any — see fallback notes — more consistent with all installed.
 ---
 
 # MTG Deck Analysis Visualization
