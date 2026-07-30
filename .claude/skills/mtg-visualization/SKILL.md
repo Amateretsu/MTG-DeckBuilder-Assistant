@@ -1,7 +1,7 @@
 ---
 name: mtg-visualization
-description: Produces an interactive deck analysis dashboard for a Magic The Gathering deck (60-card constructed or 100-card Commander) using Chart.js. Use this skill whenever the user asks to analyze, visualize, or see a breakdown of a deck — including requests like "analyze this deck", "show me the curve", "give me a deck breakdown", "visualize the mana base", or "show deck stats". Also use it when a completed deck is presented and the user hasn't explicitly said they only want the export.
-compatibility: Uses the mtg-card-taxonomy skill's reference file for the Functional Roles chart (section 4). Works without it — see the fallback note there — but categories are more consistent with it installed.
+description: Produces an interactive deck analysis dashboard for a Magic The Gathering deck (any format — 60-card constructed, Commander, Brawl, Oathbreaker, etc.) using Chart.js. Use this skill whenever the user asks to analyze, visualize, or see a breakdown of a deck — including requests like "analyze this deck", "show me the curve", "give me a deck breakdown", "visualize the mana base", or "show deck stats". Also use it when a completed deck is presented and the user hasn't explicitly said they only want the export.
+compatibility: Uses the mtg-dashboard-template skill for color palette, Chart.js defaults, stat-card CSS, and accessibility conventions (Common Settings section) — don't re-inline a separate copy of these. Uses the mtg-format-rules skill to determine which format-family branch applies in sections 5-6, rather than a hardcoded Commander-vs-60-card binary. Uses the mtg-card-taxonomy skill's reference file for the Functional Roles chart (section 4). Works without any of them — see the fallback notes — but output is more consistent with all installed.
 ---
 
 # MTG Deck Analysis Visualization
@@ -10,13 +10,11 @@ Produces an interactive dashboard using Chart.js (`https://cdnjs.cloudflare.com/
 
 **Rendering:** prefer `visualize:show_widget` when that tool is available — it's the intended path for an inline, interactive dashboard and needs no file cleanup. Fall back to a saved HTML file (via `create_file`, presented with `present_files`) only if `visualize:show_widget` isn't in your toolset for this session, or the user specifically wants a file they can keep/reopen outside the conversation. Don't default to the file path just because it's the more familiar tool call — check what's actually available first.
 
-**Format branches everything in sections 5 and 6 below** — determine constructed (60-card) vs. Commander (100-card) before building those two sections; see `mtg-deckbuilding` if the deck itself isn't finalized yet.
+**Format branches everything in sections 5 and 6 below** — determine the format family via `mtg-format-rules` (singleton/commander-slot formats — Commander, Brawl, Historic Brawl, Oathbreaker, Peasant Commander — vs. copy-limit formats — Standard, Pioneer, Modern, Legacy, Vintage, Pauper) before building those two sections. Never assume "Commander" just because a deck has a commander slot — **Brawl decks are 60-card**, which matters for land-base framing in section 6. See `mtg-deckbuilding` if the deck itself isn't finalized yet.
 
 ## Common Settings
 
-Detect dark mode via `matchMedia`; derive `textColor` and `gridColor` accordingly. All charts: `responsive: true`, `maintainAspectRatio: false`, `legend: false`, bars with `borderRadius: 4`, `borderSkipped: false`. Use CSS variables (`--color-background-secondary`, `--color-text-primary`, `--color-text-secondary`, `--color-border-tertiary`, `--border-radius-md`, `--border-radius-lg`) throughout. Include `<h2 class="sr-only">` and `role="img"` + `aria-label` on every `<canvas>`.
-
-**Color palette:** Creatures `#534AB7` · Artifacts `#1D9E75` · Sorceries `#D85A30` · Instants `#378ADD` · Planeswalkers `#D4537E` · Enchantments `#888780`
+Use `mtg-dashboard-template`'s style guide for dark-mode detection, CSS variables, Chart.js option defaults, the card-type color palette (including the Battles/Other slot), and accessibility conventions (`sr-only` headings, `role="img"`/`aria-label`) — don't re-inline a separate copy here. **If `mtg-dashboard-template` isn't installed**, fall back to: `matchMedia`-based dark-mode detection with `textColor`/`gridColor` derived from it; `responsive: true`, `maintainAspectRatio: false`, `legend: false`; bars with `borderRadius: 4`, `borderSkipped: false`; and a card-type palette of Creatures `#534AB7` · Artifacts `#1D9E75` · Sorceries `#D85A30` · Instants `#378ADD` · Planeswalkers `#D4537E` · Enchantments `#888780` · Battles/Other `#B08D57` — and mention that installing `mtg-dashboard-template` would keep this consistent with `mtg-budget-swaps`'s styling.
 
 ## 1. Summary Stat Cards
 
@@ -35,19 +33,21 @@ Vertical bar, `barPercentage: 0.7`. X-axis MV 0–13+. Bars MV 7+ in `#534AB7`, 
 
 `indexAxis: 'y'`, `barPercentage: 0.6`, categories in descending count order. Pull the taxonomy from `/mnt/skills/user/mtg-card-taxonomy/references/MTG-Card-Function-Tags.md` — use whichever of the 12 top-level categories actually appear in this deck (most decks only touch 4-6 of them; don't force every category to show up). Every nonland card should land in exactly one bucket for this chart even if it could arguably tag two ways elsewhere — pick its primary role so the bars sum to the nonland card count. **If that file isn't found**, improvise reasonable functional categories yourself (the chart still works, just without the shared vocabulary) and note in your reply that installing `mtg-card-taxonomy` would keep categories consistent with your other MTG skills.
 
-## 5. Archetype Panel — branches by format
+## 5. Archetype Panel — branches by format family
 
-**Commander:** "Commander Mechanic Panel" — rounded panel summarizing the commander's core engine, key enablers, and 3 notable synergy targets. Adapt entirely to the actual commander — no generic text.
+**Commander-slot formats (Commander, Historic Brawl, Peasant Commander — 100-card):** "Commander Mechanic Panel" — rounded panel summarizing the commander's core engine, key enablers, and 3 notable synergy targets. Adapt entirely to the actual commander — no generic text. Pull real synergy signal from `mtg-edhrec` when available rather than relying purely on judgment.
 
-**60-card constructed:** "Deck Identity & Key Synergies" panel instead — a short tag line naming the archetype (e.g. "Boros Aggro → Angels top-end → Equipment Voltron"), 2-3 sentences on the actual gameplan, then "Core enablers" and "Notable synergy targets" lists specific to this decklist. Same spirit as the Commander panel — no generic filler — just without a single commander card to anchor it.
+**Brawl and Oathbreaker (60-card, still commander/oathbreaker-anchored):** same "Commander Mechanic Panel" shape as above (there's still a single card, or card pair for Oathbreaker, to anchor it), but land-base framing in section 6 follows the 60-card branch, not the 100-card one — don't let the commander slot pull this into the wrong land-base bucket.
 
-## 6. Land Base Breakdown — branches by format
+**Copy-limit formats (Standard, Pioneer, Modern, Legacy, Vintage, Pauper):** "Deck Identity & Key Synergies" panel instead — a short tag line naming the archetype (e.g. "Boros Aggro → Angels top-end → Equipment Voltron"), 2-3 sentences on the actual gameplan, then "Core enablers" and "Notable synergy targets" lists specific to this decklist. Same spirit as the commander panel — no generic filler — just without a single anchor card.
+
+## 6. Land Base Breakdown — branches by format family
 
 4-column grid (same styling as stat cards).
 
-**Commander:** **Ramp lands** · **Utility lands** · **Interaction lands** · **Basic lands**
+**100-card Commander-slot formats (Commander, Historic Brawl, Peasant Commander):** **Ramp lands** · **Utility lands** · **Interaction lands** · **Basic lands**
 
-**60-card constructed:** **Basic lands** · **Fixing lands** (duals/gates/shocks — anything primarily there for color fixing) · **Utility/manlands** (creature lands, sac lands, cycling lands, anything with a nonbasic ability beyond fixing) · **Interaction lands** (0 is a normal answer for most constructed decks — don't force a nonzero number)
+**60-card formats, including Brawl and Oathbreaker** (copy-limit or singleton, all share the same land-base framing at this size): **Basic lands** · **Fixing lands** (duals/gates/shocks — anything primarily there for color fixing) · **Utility/manlands** (creature lands, sac lands, cycling lands, anything with a nonbasic ability beyond fixing) · **Interaction lands** (0 is a normal answer for most decks at this size — don't force a nonzero number)
 
 ## 7. Action Buttons
 

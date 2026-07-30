@@ -1,7 +1,7 @@
 ---
 name: mtg-deckbuilding
 description: Build, revise, or cut down a Magic The Gathering deck — including building a deck from a player's owned collection, trimming a card pool down to a legal deck size, choosing land counts, suggesting cuts/upgrades, or cross-referencing a wishlist against a ManaBox collection export. Use this whenever the user wants to construct or meaningfully edit a deck (not just analyze, export, or write a primer for one that's already finished) — including phrases like "build me a deck", "help me build a deck from my collection", "how many lands should I run", "what should I cut from this deck", "improve this deck using cards I own", or "trim this list down to 60/99 cards". Always use this before mtg-decklist-export, mtg-visualization, or mtg-primer when the deck itself isn't finalized yet — those skills assume a finished decklist as input.
-compatibility: Uses the mtg-collection skill to fetch and read the user's owned-card data (section 3) — always consult it rather than assuming a stale upload. Also uses the mtg-card-taxonomy skill's reference file for functional-role categorization (section 4). Works without either — see fallback notes in each section — but results are more consistent with both installed.
+compatibility: Uses the mtg-format-rules skill to determine format/deck-size/copy-limit rules (section 1) — always consult it rather than assuming a binary 60-card/Commander split. Uses the mtg-collection skill to fetch and read the user's owned-card data (section 3) — always consult it rather than assuming a stale upload. Uses the mtg-card-taxonomy skill's reference file for functional-role categorization (section 4). Uses the mtg-consistency skill for land/color-source sanity checks (section 2) and mtg-edhrec for Commander-format synergy grounding (section 4). Works without any of them — see fallback notes in each section — but results are more consistent with all installed.
 ---
 
 # MTG Deckbuilding
@@ -10,11 +10,12 @@ Builds or revises a real, legal Magic deck — as opposed to `mtg-visualization`
 
 ## 1. Determine format first — it changes everything downstream
 
-Ask yourself (infer from context where possible, ask the user if genuinely ambiguous):
-- **Deck size:** 60-card constructed, or 100-card Commander/Brawl (singleton)?
+Use the `mtg-format-rules` skill's catalog to determine deck size, copy limit, sideboard rules, and commander-slot shape — don't assume a binary 60-card-vs-Commander split from memory. **Never treat "Brawl" as a synonym for "Commander":** real Brawl is 60-card singleton with a Standard-legal commander, not 100-card. If the user says "Brawl" unqualified, ask "60-card Brawl (Standard-legal singleton), or 100-card Commander?" rather than assuming either. If `mtg-format-rules` isn't installed, fall back to asking the user directly for deck size and copy-limit rules rather than guessing — the Brawl/Commander conflation above is exactly the kind of silent-wrong-output mistake this section exists to prevent.
+
+Also ask (infer from context where possible, ask the user if genuinely ambiguous):
 - **Power level / setting:** casual kitchen-table, competitive constructed, cEDH, etc. — affects how aggressively to prioritize efficiency over synergy/fun.
 
-This determines quantity limits (singleton vs up-to-4-of), land count targets, and which downstream skill conventions apply (`mtg-decklist-export`'s filename pattern and "all quantities 1" rule is Commander-specific — for a 60-card deck, quantities can be 1-4 and the filename should reflect the archetype, not a commander name).
+Format determines quantity limits (singleton vs up-to-4-of), land count targets (which archetype table to use — see `mtg-format-rules` for the routing), and which downstream skill conventions apply (`mtg-decklist-export`'s filename pattern and quantity rule are format-parameterized, not just "Commander vs. 60-card").
 
 ## 2. Land count and curve
 
