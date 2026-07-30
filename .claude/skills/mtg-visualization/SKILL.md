@@ -1,19 +1,20 @@
 ---
 name: mtg-visualization
-description: Interactive MTG deck analysis dashboard using Chart.js. Use for deck analysis, visualization, mana curve, or breakdown requests. Also use when a completed deck is presented unless the user only wants the export.
+description: Produces an interactive deck analysis dashboard for a Magic The Gathering deck (60-card constructed or 100-card Commander) using Chart.js. Use this skill whenever the user asks to analyze, visualize, or see a breakdown of a deck — including requests like "analyze this deck", "show me the curve", "give me a deck breakdown", "visualize the mana base", or "show deck stats". Also use it when a completed deck is presented and the user hasn't explicitly said they only want the export.
+compatibility: Uses the mtg-card-taxonomy skill's reference file for the Functional Roles chart (section 4). Works without it — see the fallback note there — but categories are more consistent with it installed.
 ---
 
 # MTG Deck Analysis Visualization
 
-Produces an interactive HTML dashboard via `visualize:show_widget` using Chart.js (`https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js`).
+Produces an interactive dashboard using Chart.js (`https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js`).
+
+**Rendering:** prefer `visualize:show_widget` when that tool is available — it's the intended path for an inline, interactive dashboard and needs no file cleanup. Fall back to a saved HTML file (via `create_file`, presented with `present_files`) only if `visualize:show_widget` isn't in your toolset for this session, or the user specifically wants a file they can keep/reopen outside the conversation. Don't default to the file path just because it's the more familiar tool call — check what's actually available first.
+
+**Format branches everything in sections 5 and 6 below** — determine constructed (60-card) vs. Commander (100-card) before building those two sections; see `mtg-deckbuilding` if the deck itself isn't finalized yet.
 
 ## Common Settings
 
-- Dark mode: detect via `matchMedia`; derive `textColor` and `gridColor`
-- All charts: `responsive: true`, `maintainAspectRatio: false`, no built-in legend
-- Bars: `borderRadius: 4`, `borderSkipped: false`
-- CSS vars: `--color-background-secondary`, `--color-text-primary`, `--color-text-secondary`, `--color-border-tertiary`, `--border-radius-md`, `--border-radius-lg`
-- Accessibility: `<h2 class="sr-only">` + `role="img"` and `aria-label` on every `<canvas>`
+Detect dark mode via `matchMedia`; derive `textColor` and `gridColor` accordingly. All charts: `responsive: true`, `maintainAspectRatio: false`, `legend: false`, bars with `borderRadius: 4`, `borderSkipped: false`. Use CSS variables (`--color-background-secondary`, `--color-text-primary`, `--color-text-secondary`, `--color-border-tertiary`, `--border-radius-md`, `--border-radius-lg`) throughout. Include `<h2 class="sr-only">` and `role="img"` + `aria-label` on every `<canvas>`.
 
 **Color palette:** Creatures `#534AB7` · Artifacts `#1D9E75` · Sorceries `#D85A30` · Instants `#378ADD` · Planeswalkers `#D4537E` · Enchantments `#888780`
 
@@ -32,21 +33,25 @@ Vertical bar, `barPercentage: 0.7`. X-axis MV 0–13+. Bars MV 7+ in `#534AB7`, 
 
 ## 4. Functional Roles Horizontal Bar
 
-`indexAxis: 'y'`, `barPercentage: 0.6`, categories in descending count order drawn from the deck's actual tags. Use these 12 top-level tag names exactly:
+`indexAxis: 'y'`, `barPercentage: 0.6`, categories in descending count order. Pull the taxonomy from `/mnt/skills/user/mtg-card-taxonomy/references/MTG-Card-Function-Tags.md` — use whichever of the 12 top-level categories actually appear in this deck (most decks only touch 4-6 of them; don't force every category to show up). Every nonland card should land in exactly one bucket for this chart even if it could arguably tag two ways elsewhere — pick its primary role so the bars sum to the nonland card count. **If that file isn't found**, improvise reasonable functional categories yourself (the chart still works, just without the shared vocabulary) and note in your reply that installing `mtg-card-taxonomy` would keep categories consistent with your other MTG skills.
 
-`Card Advantage` · `Removal` · `Countermagic` · `Mana` · `Recursion` · `Tutors` · `Win Conditions` · `Creatures` · `Synergy` · `Enchantments` · `Resource Denial` · `Utility`
+## 5. Archetype Panel — branches by format
 
-## 5. Commander Mechanic Panel
+**Commander:** "Commander Mechanic Panel" — rounded panel summarizing the commander's core engine, key enablers, and 3 notable synergy targets. Adapt entirely to the actual commander — no generic text.
 
-Rounded panel. Format: commander name as heading, core engine in 2–3 sentences, enablers as an inline list, each of 3 notable synergy targets with a one-sentence note. Adapt entirely to the actual commander — no generic text.
+**60-card constructed:** "Deck Identity & Key Synergies" panel instead — a short tag line naming the archetype (e.g. "Boros Aggro → Angels top-end → Equipment Voltron"), 2-3 sentences on the actual gameplan, then "Core enablers" and "Notable synergy targets" lists specific to this decklist. Same spirit as the Commander panel — no generic filler — just without a single commander card to anchor it.
 
-## 6. Land Base Breakdown
+## 6. Land Base Breakdown — branches by format
 
-4-column grid (same styling as stat cards): **Ramp lands** · **Utility lands** · **Interaction lands** · **Basic lands**.
+4-column grid (same styling as stat cards).
+
+**Commander:** **Ramp lands** · **Utility lands** · **Interaction lands** · **Basic lands**
+
+**60-card constructed:** **Basic lands** · **Fixing lands** (duals/gates/shocks — anything primarily there for color fixing) · **Utility/manlands** (creature lands, sac lands, cycling lands, anything with a nonbasic ability beyond fixing) · **Interaction lands** (0 is a normal answer for most constructed decks — don't force a nonzero number)
 
 ## 7. Action Buttons
 
-3 buttons via `sendPrompt()`:
-- `"Export this [Commander] deck as a .txt file and write the Moxfield primer"`
-- `"Suggest budget alternatives for the most expensive cards in this deck"`
+3 buttons via `sendPrompt()`. Adapt to what's actually true of this deck rather than using the same three by default:
+- Always include: `"Export this deck as a downloadable .txt file"` (name it after the commander for Commander decks, the archetype for constructed)
+- `"Suggest budget alternatives for the most expensive cards in this deck"` — **only** if this deck is being priced for purchase. Skip it (swap in something else, e.g. mulligan guide or a sideboard/upgrade-from-collection prompt) if the deck was built from cards the user already owns — budget swaps don't make sense for "here's what I have."
 - `"What are the best opening hands and mulligan strategy for this deck?"`
