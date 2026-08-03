@@ -19,7 +19,22 @@ Save to `/mnt/user-data/outputs/`. Call `present_files` after saving. Note: *"He
 - Card image links: `[[Card Name]]` or `[[Card Name|SET]]` — highlight a card's name at least the first mention per panel so readers (especially newer players) can hover for the card image. Not necessary on every repeat mention within the same panel — that gets tedious for no added value.
 - Collapsible sections: `===accordion` / `===panel: Title` / `===endpanel` / `===endaccordion`
 - **Panels are the real hierarchy, not markdown headers.** Moxfield builds its primer table-of-contents/navigation from `===panel:` entries, not from `#`/`##`/`###` headings. A section that should be independently navigable — reachable without scrolling past everything before it — needs to be its own top-level panel, full stop. Markdown headings inside a panel's body are just formatting within that panel's text, not a substitute for panel structure.
-- **Panels nest.** A panel can contain its own `===accordion` / `===panel:` block inside it (nested one level, sometimes two). Use this for one-entry-per-item breakdowns inside a broader section — e.g. one sub-panel per key card inside "Single-Card Discussion," or one sub-panel per dated revision inside "Card Log." Closing the parent panel collapses all its children with it, which is exactly what keeps a long primer manageable.
+- **Panels nest, but a nested `===panel:` needs its own `===accordion`/`===endaccordion` wrapper around it** — a bare `===panel:` dropped directly inside another panel's body, with no accordion wrapper, doesn't get parsed as a panel at all; Moxfield renders the literal `===panel: Title` text inline with the following paragraph instead of a collapsible header. Confirmed by observed rendering failure, not just spec-reading — don't skip the wrapper to save two lines. Use this pattern for one-entry-per-item breakdowns inside a broader section — e.g. one sub-panel per key card inside "Single-Card Discussion," or one sub-panel per dated revision inside "Card Log":
+  ```
+  ===panel: Single-Card Discussion
+
+  ===accordion
+
+  ===panel: Card Name
+
+  Body text.
+  ===endpanel
+
+  ===endaccordion
+
+  ===endpanel
+  ```
+  Closing the parent panel collapses all its children with it, which is exactly what keeps a long primer manageable. Also: put a blank line between every `===panel: Title` line and its body text — without it, some renders run the title into the first sentence.
 - **Not supported:** code blocks, blockquotes, TeX, header anchor links
 - Inline HTML allowed — no `<style>` or `<script>`
 

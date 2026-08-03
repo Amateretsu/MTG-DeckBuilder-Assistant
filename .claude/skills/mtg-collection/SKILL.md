@@ -1,7 +1,7 @@
 ---
 name: mtg-collection
 description: Fetches and reads the user's current Magic The Gathering card collection (a ManaBox export) before any task that depends on what cards they own, AND provides a fast-path cache of static Scryfall card data (oracle text, cost, type, legality) to speed up card verification. This is the single source of truth for both collection ownership data and cached card facts — always use this skill instead of re-deriving fetch logic or assuming a stale file whenever a task involves "my collection," "cards I own," building or trimming a deck from owned cards, checking whether specific printings are owned, cross-referencing a wishlist/decklist against ownership, or verifying a card's oracle text/legality. Other MTG skills (mtg-deckbuilding, and any future skill needing ownership data or card facts) depend on this skill and should call into it rather than hardcoding a CSV path or always doing a fresh web search.
-compatibility: Requires Google Drive tool access to search and download from the user's "ManaBox Exports" folder (collection data — section 1). Falls back to an uploaded CSV or a static project file if Drive is unavailable — see section 2. The Scryfall data cache (section 5) requires web_fetch access to a public GitHub raw URL — no additional setup needed.
+compatibility: Requires Google Drive tool access to search and download from the user's "ManaBox Exports" folder (collection data — section 1). Falls back to an uploaded CSV or a static project file if Drive is unavailable — see section 2. The Scryfall data cache (section 5) is fetched via bash_tool/curl and requires `raw.githubusercontent.com` on the network egress allowlist.
 ---
 
 # MTG Collection Data
@@ -62,9 +62,9 @@ Separate from the ManaBox export above (which tells you what you *own*), a weekl
 
 **Fetching it:**
 ```
-web_fetch: https://raw.githubusercontent.com/Amateretsu/MTG-DeckBuilder-Assistant/refs/heads/main/data/scryfall_cache.csv
+bash_tool: curl -sS "https://raw.githubusercontent.com/Amateretsu/MTG-DeckBuilder-Assistant/refs/heads/main/data/scryfall_cache.csv" -o /tmp/scryfall_cache.csv
 ```
-Always pass an explicit, high `text_content_token_limit` on this fetch — the default truncates well before reaching the end of the file at current collection size (rows are roughly alphabetical by name, so truncation cuts off later letters first).
+Requires `raw.githubusercontent.com` on the bash_tool network egress allowlist. Fetch to a local scratch path and read/filter it with the `view` tool or a script rather than dumping the whole file into context — it's large, and unlike a web_fetch there's no automatic truncation, so pulling it in wholesale wastes context. Use `grep`/`awk`/pandas on the local file to pull just the rows you need.
 
 **Schema** (CSV columns): `oracle_id, name, mana_cost, cmc, type_line, oracle_text, colors, color_identity, legalities_commander, legalities_standard, legalities_modern, scryfall_id`
 
@@ -72,4 +72,4 @@ Always pass an explicit, high `text_content_token_limit` on this fetch — the d
 
 **What it deliberately does NOT contain:** prices. Never treat this cache as a price source — always fetch current pricing live (Scryfall search+fetch) for anything price-sensitive (e.g. `mtg-budget-swaps`).
 
-**Truncation is safe, not silently wrong — treat it that way:** if a card you're looking for isn't in the portion of the file you got back, that's not proof it's uncached — it may just be past the cutoff. In that case, fall back to live Scryfall search+fetch exactly as you would for a card that's genuinely missing from the cache. **Never skip verification because you assume a card is "probably in there."** This cache only ever saves redundant lookups; it should never be the reason a card's text/cost/legality goes unverified.
+**A miss is not proof of "uncached":** curl pulls the whole file to disk, so there's no truncation risk in the way a web_fetch had — but a `grep` that doesn't match (wrong name formatting, apostrophes, punctuation) can still look like a miss when the row is actually there. If a card doesn't turn up, double-check the query before concluding it's missing, and if still not found, fall back to live Scryfall search+fetch exactly as you would for a card genuinely missing from the cache. **Never skip verification because you assume a card is "probably in there."** This cache only ever saves redundant lookups; it should never be the reason a card's text/cost/legality goes unverified.
